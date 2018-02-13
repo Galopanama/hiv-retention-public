@@ -1,0 +1,175 @@
+default_intervals: &default_intervals
+        ['all', '6months', '1years', '2years']
+default_groups: &default_groups
+        ['entity_id']
+all_metrics: &all_metrics
+        ['min', 'max', 'avg']
+feature_aggregations:
+    -
+        prefix: 'acs'
+        from_obj: features_cs.acs
+        knowledge_date_column: 'date_col'
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+
+        aggregates:
+            -
+                quantity: total_population
+                metrics: ['max']
+            -
+                quantity: total_black
+                metrics: ['max']
+            -
+                quantity: frac_black
+                metrics: ['max']
+            -
+                quantity: frac_native_born
+                metrics: ['max']
+            -
+                quantity: frac_mobility_same_house
+                metrics: ['max']
+            -
+                quantity: frac_mobility_moved_same_county
+                metrics: ['max']
+            -
+                quantity: frac_mobility_moved_diff_county
+                metrics: ['max']
+            -
+                quantity: frac_mobility_moved_diff_state
+                metrics: ['max']
+            -
+                quantity: with_ssisnap
+                metrics: ['max']
+            -
+                quantity: frac_with_ssisnap
+                metrics: ['max']
+            -
+                quantity: frac_ratio_lt_1_3
+                metrics: ['max']
+            -
+                quantity: frac_ratio_1_3_to_1_49
+                metrics: ['max']
+            -
+                quantity: frac_ratio_1_5_to_1_84
+                metrics: ['max']
+            -
+                quantity: frac_ratio_gte_1_85
+                metrics: ['max']
+            -
+                quantity: frac_income_lt_10k
+                metrics: ['max']
+            -
+                quantity: frac_income_10_to_15k
+                metrics: ['max']
+            -
+                quantity: frac_income_15_to_20k
+                metrics: ['max']
+            -
+                quantity: frac_income_20_to_25k
+                metrics: ['max']
+            -
+                quantity: frac_income_25_to_30k
+                metrics: ['max']
+            -
+                quantity: frac_income_30_to_35k
+                metrics: ['max']
+            -
+                quantity: travel_time_work
+                metrics: ['max']
+            -
+                quantity: num_vehicles_to_work
+                metrics: ['max']
+            -
+                quantity: no_schooling
+                metrics: ['max']
+            -
+                quantity: elementary_school
+                metrics: ['max']
+            -
+                quantity: middle_school
+                metrics: ['max']
+            -
+                quantity: high_school
+                metrics: ['max']
+            -
+                quantity: lt_1yr_college
+                metrics: ['max']
+            -
+                quantity: some_college
+                metrics: ['max']
+        intervals: ['all']
+        groups: *default_groups
+
+    -
+        prefix: 'crime'
+        from_obj: features_cs.crimes
+        knowledge_date_column: 'date_col'
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+        aggregates:
+            -
+                quantity: crimes
+                metrics: *all_metrics
+            -
+                quantity: arrests
+                metrics: *all_metrics
+            -
+                quantity: non_arrests
+                metrics: *all_metrics
+            -
+                quantity: domestic
+                metrics: *all_metrics
+            -
+                quantity: non_domestic
+                metrics: *all_metrics
+            -
+                quantity: narcotics
+                metrics: *all_metrics
+            -
+                quantity: other_narcotic
+                metrics: *all_metrics
+            -
+                quantity: theft
+                metrics: *all_metrics
+            -
+                quantity: vehicle_theft
+                metrics: *all_metrics
+            -
+                quantity: burglary
+                metrics: *all_metrics
+            -
+                quantity: robbery
+                metrics: *all_metrics
+            -
+                quantity: homicide
+                metrics: *all_metrics
+            -
+                quantity: weapons_violation
+                metrics: *all_metrics
+            -
+                quantity: battery
+                metrics: *all_metrics
+            -
+                quantity: assault
+                metrics: *all_metrics
+            -
+                quantity: domestic_violence
+                metrics: *all_metrics
+            -
+                quantity: prostitution
+                metrics: *all_metrics
+            -
+                quantity: sex_offense
+                metrics: *all_metrics
+            -
+                quantity: public_peace
+                metrics: *all_metrics
+            -
+                quantity: liquor_law
+                metrics: *all_metrics
+        intervals: *default_intervals
+        groups: *default_groups

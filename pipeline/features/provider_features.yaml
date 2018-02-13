@@ -1,0 +1,46 @@
+default_intervals: &default_intervals
+        ['all', '6months', '1years', '2years']
+default_groups: &default_groups
+        ['entity_id']
+
+feature_aggregations:
+    -
+        # Most common attendings, number of unique attendings
+        prefix: 'providers'
+        from_obj: features_cs.providers
+        knowledge_date_column: 'date_col'
+
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+
+        aggregates:
+            -
+                quantity: 'provider_id'
+                metrics:
+                    - 'count_distinct' # user function; might need to verify to ensure correctness
+                    - 'dsapp_mode'
+        intervals: *default_intervals
+        groups:
+            - 'entity_id'
+    -
+        # Number of facilities
+        prefix: 'facilities'
+        from_obj: features_cs.facilities
+        knowledge_date_column: 'date_col'
+
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+
+        aggregates:
+            -
+                quantity: 'facility_id'
+                metrics:
+                    - 'count'
+        intervals: *default_intervals
+        groups:
+            - 'entity_id'
+

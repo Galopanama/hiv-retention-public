@@ -1,0 +1,21 @@
+feature_aggregations:
+    -
+        # Feature for number of previously used health insurances
+        prefix: 'insurance'
+        from_obj: features_cs.insurance
+        knowledge_date_column: 'date_col'
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+
+        aggregates:
+            -
+                quantity: 'insurance_id'
+                metrics:
+                    - 'count_distinct'
+                    - 'dsapp_mode'    
+        intervals:
+            - 'all'
+        groups:
+            - 'entity_id'

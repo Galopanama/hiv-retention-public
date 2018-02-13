@@ -1,0 +1,112 @@
+---
+# CONFIG_VERSION
+# The experiment configuration changes from time to time, and we upgrade the
+# triage.experiments.CONFIG_VERSION variable whenever drastic changes that break
+# old configuration files are released. Be sure to assign the config version
+# that matches the triage.experiments.CONFIG_VERSION in the triage release
+# you are developing against!
+
+config_version: 'v2'
+
+# EXPERIMENT METADATA
+model_comment: 'DT, RF, LR, GB for KDD (new DB)'
+
+# TIME SPLITTING
+# The time window to look at, and how to divide the window into
+# train/test splits
+temporal_config:
+    beginning_of_time: '2008-01-01'    # earliest date included in features
+    modeling_start_time: '2009-01-01'  # earliest date in any model
+    modeling_end_time: '2017-01-01'    # all dates in any model are < this date
+    update_window: '1year'             # how frequently to retrain models
+    train_example_frequency: '1day'    # time between rows for same entity in train matrix
+    test_example_frequency: '1day'     # time between rows for same entity in test matrix
+    train_durations: ['10years']       # length of time included in a train matrix
+    test_durations: ['1year']          # length of time included in a test matrix
+    train_label_windows: ['1year']     # time period across which outcomes are labeled in train matrices
+    test_label_windows: ['1year']      # time period across which outcomes are labeled in test matrices
+
+# LABEL GENERATION
+# Information needed to generate labels
+#
+# An events table is expected, with the columns:
+#   entity_id - an identifier for which the labels are applied to
+#   outcome_date - The date at which some outcome was known
+#   outcome - A boolean outcome
+# These are used to generate appropriate labels for each train/test split
+events_table: 'events_on_appt_dates_cs'
+
+# FEATURE GROUPING
+#feature_group_definition:
+    #prefix: ['acs', 'crime', 'cd4', 'demo', 'diag', 'expert', 'facilities', 'first_appt', 'insurance', 'location', 'prevenc', 'prevenc_id', 'providers', 'vl'] 
+    #tables:
+        #- 'acs_aggregation'
+        #- 'crime_aggregation'
+        #- 'cd4_aggregation'
+        #- 'demo_aggregation'
+        #- 'diag_aggregation'
+        #- 'expert_aggregation'
+        #- 'facilities_aggregation'
+        #- 'first_appt_aggregation'
+        #- 'insurance_aggregation'
+        #- 'location_aggregation'
+        #- 'prevenc_aggregation'
+        #- 'prevenc_id_aggregation'
+        #- 'providers_aggregation'
+        #- 'vl_aggregation'
+
+# strategies for generating combinations of groups
+# available: all, leave-one-out, leave-one-in
+#feature_group_strategies: ['leave-one-out']
+
+# STATE MANAGEMENT (optional)
+state_config:
+    table_name: 'states_for_predicting_appts_only_test'
+    state_filters:
+        - 'active'
+
+
+# MODEL GROUPING
+model_group_keys: #[]
+    - 'train_duration'
+    - 'label_window'
+    - 'example_frequency'
+
+# GRID CONFIGURATION
+# The classifier/hyperparameter combinations that should be trained
+grid_config:
+    'sklearn.tree.DecisionTreeClassifier':
+        criterion: ['entropy'] #criterion: ['gini', 'entropy']
+        max_depth: [1, 2, 5, 10]
+        random_state: [2193]
+    'sklearn.ensemble.RandomForestClassifier':
+        n_estimators: [100, 5000, 10000]
+        max_depth: [1, 2, 5, 10, ~]
+        max_features: ['log2', 'sqrt']
+        criterion: ['gini']
+        min_samples_split: [2, 5]
+        random_state: [2193] 
+    'sklearn.linear_model.LogisticRegression':
+        C: [0.001, 0.01, 1]  
+        penalty: ['l1', 'l2']
+        random_state: [2193]
+
+
+# MODEL SCORING
+scoring:
+    sort_seed: 5
+    metric_groups:
+        -
+            metrics: [precision@, recall@]
+            thresholds:
+                percentiles: [1.0, 5.0, 10.0, 25.0, 50.0, 100.0]
+                top_n: [5, 10, 50, 75]
+        -
+            metrics: [f1]
+        -
+            metrics: [fbeta@]
+            parameters:
+                -
+                    beta: 0.75
+                -
+                    beta: 1.25

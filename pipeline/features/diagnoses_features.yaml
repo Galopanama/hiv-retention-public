@@ -1,0 +1,76 @@
+default_intervals: &default_intervals
+        ['all', '6months', '1years', '2years']
+default_groups: &default_groups
+        ['entity_id']
+
+feature_aggregations:
+    -
+        # We want to include feature indicating if current appt is
+        # patient's first appt. We add a date with first_appt_flag=1
+        # a day before the first appt, use min as agg function and
+        # set lookback to all time. By doing so, the feature has value 1
+        # only on day of first appointment. Afterwards, the min value will
+        # always be 0.
+        prefix: 'first_appt'
+        from_obj: features_cs.first_appt
+        knowledge_date_column: 'date_col'
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+        aggregates:
+            -
+                quantity: 'first_appt_flag'
+                metrics:
+                    - 'min'
+        intervals: *default_intervals
+        groups:
+            - 'entity_id'
+    -
+        prefix: 'diag'
+        from_obj: features_cs.diagnoses
+        knowledge_date_column: 'date_col'
+
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+
+        aggregates:
+            -
+                quantity: 'psychiatric_illness'
+                metrics: ['sum', 'avg', 'max']
+            -
+                quantity: 'hospital'
+                metrics: ['sum', 'avg', 'max']
+            -
+                quantity: 'oi'
+                metrics: ['sum', 'avg', 'max']
+            -
+                quantity: 'sti'
+                metrics: ['sum', 'avg', 'max']
+            -
+                quantity: 'substance'
+                metrics: ['max', 'sum', 'avg']
+        categoricals:
+             -
+                column: 'diagnosis'
+                metrics:
+                    - 'max'
+                imputation:
+                    max:
+                        type: 'constant'
+                        value: 'other'
+                choice_query: 'select distinct diagnosis from features_cs.diagnoses'
+             -
+                column: 'ccs_cat'
+                metrics:
+                     - 'max'
+                imputation:
+                    max:
+                        type: 'constant'
+                        value: '0'
+                choice_query: 'select distinct ccs_cat from features_cs.diagnoses'
+        intervals: *default_intervals
+        groups:
+            - 'entity_id'

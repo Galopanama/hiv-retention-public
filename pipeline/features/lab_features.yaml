@@ -1,0 +1,47 @@
+default_intervals: &default_intervals
+        ['all', '6months', '1years', '2years']
+default_groups: &default_groups
+        ['entity_id']
+all_metrics: &all_metrics
+        ['min', 'max', 'count', 'avg', 'stddev', 'variance', 'dsapp_mode']
+
+feature_aggregations:
+    -
+        # Viral Load
+        prefix: 'vl'
+        from_obj: features_cs.viral_load
+        knowledge_date_column: 'date_col'
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+        aggregates:
+            -
+                quantity: 'lab_result'
+                metrics: *all_metrics
+        intervals: *default_intervals
+        groups:
+            - 'entity_id'
+    -
+        # CD4
+        prefix: 'cd4'
+        from_obj: features_cs.cd4cd8_ratio
+        knowledge_date_column: 'date_col'
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+        aggregates:
+            -
+                quantity: 'cd4'
+                metrics: *all_metrics
+            -
+                quantity: 'cd8'
+                metrics: *all_metrics
+            -
+                quantity: 'cd4cd8_ratio'
+                metrics: *all_metrics
+        intervals: *default_intervals
+        groups:
+            - 'entity_id'
+

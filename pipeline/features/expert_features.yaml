@@ -1,0 +1,30 @@
+default_intervals: &default_intervals
+        ['all', '6months', '1years', '2years']
+default_groups: &default_groups
+        ['entity_id']
+
+feature_aggregations:
+    -
+        prefix: 'expert'
+        from_obj: features_cs.expert
+        knowledge_date_column: 'date_col'
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+        aggregates:
+            -
+                quantity: 'tox_pos'
+                metrics: ['sum']
+            -
+                quantity: 'missed_id_appt'
+                metrics: ['sum']
+            -
+                quantity: 'missed_appt'
+                metrics: ['sum']
+            -
+                quantity: 'substance_use'
+                metrics: ['sum']
+        intervals: *default_intervals
+        groups:
+            - 'entity_id'

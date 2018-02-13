@@ -1,0 +1,56 @@
+default_intervals: &default_intervals
+        ['all', '6months', '1years', '2years']
+default_groups: &default_groups
+        ['entity_id']
+
+feature_aggregations:
+    -
+        # Feature for number of previous id appts.
+        prefix: 'prevenc_id'
+        from_obj: features_cs.id_appt
+        knowledge_date_column: 'date_col'
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+        aggregates:
+            -
+                quantity: 'completed'
+                metrics: ['sum', 'avg']
+            -
+                quantity: 'scheduled'
+                metrics: ['sum', 'avg']
+            -
+                quantity: 'cancelled'
+                metrics: ['sum', 'avg']
+            -
+                quantity: 'noshow'
+                metrics: ['sum', 'avg']
+        intervals: *default_intervals
+        groups:
+            - 'entity_id'
+    -
+        # Feature for number of previous appts.
+        prefix: 'prevenc'
+        from_obj: features_cs.appt
+        knowledge_date_column: 'date_col'
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+        aggregates:
+            -
+                quantity: 'completed'
+                metrics: ['sum', 'avg']
+            -
+                quantity: 'scheduled'
+                metrics: ['sum', 'avg']
+            -
+                quantity: 'cancelled'
+                metrics: ['sum', 'avg']
+            -
+                quantity: 'noshow'
+                metrics: ['sum', 'avg']
+        intervals: *default_intervals
+        groups:
+            - 'entity_id'

@@ -1,0 +1,107 @@
+default_intervals: &default_intervals
+        ['all', '6months', '1years', '2years']
+default_groups: &default_groups
+        ['entity_id']
+
+feature_aggregations:
+    -
+        prefix: 'demo'
+        from_obj: features_cs.demographics
+        knowledge_date_column: 'knowledge_date_column'
+
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+
+        aggregates:
+            -
+                quantity:
+                    age: "EXTRACT( YEAR FROM age('{collate_date}', date_of_birth))"
+                imputation:
+                    max:
+                        type: 'constant'
+                        value: 43
+                metrics:
+                    - 'max'
+
+        categoricals:
+            -
+                column: 'race_id'
+                choices:
+                    - '1'
+                    - '2'
+                    - '3'
+                    - '4'
+                    - '5'
+                    - '6'
+                    - '7'
+
+                imputation:
+                    max:
+                        type: 'constant'
+                        value: '1'
+                metrics:
+                    - 'max'
+
+            -
+                column: 'ethnicity_id'
+                choices:
+                    - '1'
+                    - '2'
+                    - '3'
+                    - '4'
+
+                imputation:
+                    max:
+                        type: 'constant'
+                        value: '1'
+                metrics:
+                    - 'max'
+
+            -
+                column: 'gender_id'
+                choices:
+                    - 'male'
+                    - 'female'
+                    - 'other'
+                imputation:
+                    max:
+                        type: 'constant'
+                        value: "M"
+                metrics:
+                    - 'max'
+        intervals:
+            - 'all'
+        groups:
+            - 'entity_id'
+
+    -
+        prefix: 'location'
+        from_obj: features_cs.location
+        knowledge_date_column: 'knowledge_date_column'
+
+        aggregates_imputation:
+            all:
+                type: 'constant'
+                value: 0
+
+        categoricals:
+            -
+                column: 'zip'
+                imputation:
+                    max:
+                        type: 'constant'
+                        value: "0"
+                metrics: ['max']
+                choice_query: 'select distinct zip from features_cs.location'
+            -
+                column: 'census_tract'
+                imputation:
+                    max:
+                        type: 'constant'
+                        value: "0"
+                metrics: ['max']
+                choice_query: 'select distinct census_tract from features_cs.location'
+        intervals: ['all']
+        groups: *default_groups
